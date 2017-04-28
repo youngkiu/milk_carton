@@ -4,9 +4,12 @@ import numpy as np
 from PIL import Image
 
 
-def load_train_data(x_data, y_data):
+def load_train_data():
     normal_img_dir = "skive/normal_img/"
     defect_img_dir = "skive/defect_img/"
+
+    x_data = []
+    y_data = []
 
     files = os.listdir(normal_img_dir)
     for file in files:
@@ -31,14 +34,14 @@ def load_train_data(x_data, y_data):
             x_data = np.concatenate((x_data, [np.concatenate(pix)]), axis=0)
             y_data = np.concatenate((y_data, [[0, 1]]), axis=0)
 
+    return x_data, y_data
+
+if __name__ == '__main__':
+    x_data, y_data = load_train_data()
     print(x_data.shape)
     print(y_data.shape)
 
-    return np.size(x_data, 0)
-
-if __name__ == '__main__':
-    x_data = []
-    y_data = []
-
-    num_of_data = load_train_data(x_data, y_data)
+    num_of_data = np.size(x_data, 0)
+    image_size = np.size(x_data, 1)
+    nb_classes = np.size(y_data, 1)
 
