@@ -8,10 +8,10 @@ from PIL import Image
 def loadImage(imageFile, labelFile):
     xImage = Image.open(imageFile).convert("L")
     yLabel = Image.open(labelFile).convert("L")
-    plt.imshow(xImage, cmap='Greys')
-    plt.show()
-    plt.imshow(yLabel, cmap='Greys')
-    plt.show()
+    #plt.imshow(xImage, cmap='Greys')
+    #plt.show()
+    #plt.imshow(yLabel, cmap='Greys')
+    #plt.show()
 
     xPix = np.array(xImage)
     yPix = np.array(yLabel)
@@ -33,5 +33,11 @@ def loadImage(imageFile, labelFile):
 
 
 if __name__ == '__main__':
-    #loadImage("skive/normal_img/0.png")
-    xy = loadImage("skive/defect_img/image_0.png", "skive/defect_img/label_0.png")
+    normal_img_dir = "skive/normal_img/"
+    defect_img_dir = "skive/defect_img/"
+
+    files = os.listdir(defect_img_dir)
+    for file in files:
+        if file.find("image") >= 0:
+            xy = loadImage("{0}{1}".format(defect_img_dir, file), \
+                           "{0}{1}".format(defect_img_dir, file.replace("image", "label")))
