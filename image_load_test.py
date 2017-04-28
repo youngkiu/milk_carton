@@ -43,26 +43,30 @@ def selectTrainingData():
     numOfTrainingData = numOfNormalImg + numOfDefectImg
 
     selectedIndex = random.randint(0, numOfTrainingData - 1)
-    #print(selectedIndex, numOfTrainingData)
+    #print(selectedIndex, numOfNormalImg, numOfDefectImg, numOfTrainingData)
 
     if selectedIndex < numOfNormalImg:
         fileIndex = 0
         files = os.listdir(normal_img_dir)
         for file in files:
             if file.find("label") < 0:
-                fileIndex += 1
                 if fileIndex == selectedIndex:
                     xy = loadImage("{0}{1}".format(normal_img_dir, file), \
                                    "{0}{1}".format(normal_img_dir, "label.png"))
+                    break
+                fileIndex += 1
     else:
         fileIndex = numOfNormalImg
         files = os.listdir(defect_img_dir)
         for file in files:
             if file.find("image") >= 0:
-                fileIndex += 1
                 if fileIndex == selectedIndex:
                     xy = loadImage("{0}{1}".format(defect_img_dir, file), \
                                    "{0}{1}".format(defect_img_dir, file.replace("image", "label")))
+                    break
+                fileIndex += 1
+
+    return xy
 
 if __name__ == '__main__':
     random.seed(20170428)
