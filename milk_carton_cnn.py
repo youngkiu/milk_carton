@@ -80,35 +80,35 @@ if __name__ == '__main__':
     Y = tf.placeholder(tf.float32, [None, nb_classes])
 
     # L1 ImgIn shape=(?, 1660, 300, 1)
-    W1 = tf.Variable(tf.random_normal([3, 3, 1, 4], stddev=0.01))
-    #    Conv     -> (?, 1660, 300, 4)
-    #    Pool     -> (?, 830, 150, 4)
+    W1 = tf.Variable(tf.random_normal([3, 3, 1, 8], stddev=0.01))
+    #    Conv     -> (?, 1660, 300, 8)
+    #    Pool     -> (?, 830, 150, 8)
     L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
     L1 = tf.nn.relu(L1)
     L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
     '''
-    Tensor("Conv2D:0", shape=(?, 1660, 300, 4), dtype=float32)
-    Tensor("Relu:0", shape=(?, 1660, 300, 4), dtype=float32)
-    Tensor("MaxPool:0", shape=(?, 830, 150, 4), dtype=float32)
+    Tensor("Conv2D:0", shape=(?, 1660, 300, 8), dtype=float32)
+    Tensor("Relu:0", shape=(?, 1660, 300, 8), dtype=float32)
+    Tensor("MaxPool:0", shape=(?, 830, 150, 8), dtype=float32)
     '''
 
-    # L2 ImgIn shape=(?, 830, 150, 4)
-    W2 = tf.Variable(tf.random_normal([3, 3, 4, 8], stddev=0.01))
-    #    Conv      ->(?, 830, 150, 8)
-    #    Pool      ->(?, 415, 75, 8)
+    # L2 ImgIn shape=(?, 830, 150, 8)
+    W2 = tf.Variable(tf.random_normal([3, 3, 8, 16], stddev=0.01))
+    #    Conv      ->(?, 830, 150, 16)
+    #    Pool      ->(?, 415, 75, 16)
     L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
     L2 = tf.nn.relu(L2)
     L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-    L2_flat = tf.reshape(L2, [-1, 415 * 75 * 8])
+    L2_flat = tf.reshape(L2, [-1, 415 * 75 * 16])
     '''
-    Tensor("Conv2D_1:0", shape=(?, 830, 150, 8), dtype=float32)
-    Tensor("Relu_1:0", shape=(?, 830, 150, 8), dtype=float32)
-    Tensor("MaxPool_1:0", shape=(?, 415, 75, 8), dtype=float32)
+    Tensor("Conv2D_1:0", shape=(?, 830, 150, 16), dtype=float32)
+    Tensor("Relu_1:0", shape=(?, 830, 150, 16), dtype=float32)
+    Tensor("MaxPool_1:0", shape=(?, 415, 75, 16), dtype=float32)
     Tensor("Reshape_1:0", shape=(?, 3136), dtype=float32)
     '''
 
-    # Final FC 415x75x8 inputs -> nb_classes outputs
-    W3 = tf.get_variable("W3", shape=[415 * 75 * 8, nb_classes],
+    # Final FC 415x75x16 inputs -> nb_classes outputs
+    W3 = tf.get_variable("W3", shape=[415 * 75 * 16, nb_classes],
                          initializer=tf.contrib.layers.xavier_initializer())
     b = tf.Variable(tf.random_normal([nb_classes]))
     logits = tf.matmul(L2_flat, W3) + b
@@ -164,7 +164,6 @@ Epoch: 0014 cost = 0.002981643
 Epoch: 0015 cost = 0.002812635
 Learning Finished!
 (19, 498000)
-(19,)
 skive/test/0.png 	normal
 skive/test/1.png 	normal
 skive/test/10.png 	defect
