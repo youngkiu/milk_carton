@@ -80,7 +80,7 @@ if __name__ == '__main__':
     Y = tf.placeholder(tf.float32, [None, nb_classes])
 
     # L1 ImgIn shape=(?, 1660, 300, 1)
-    W1 = tf.Variable(tf.random_normal([5, 5, 1, 4], stddev=0.01))
+    W1 = tf.Variable(tf.random_normal([3, 3, 1, 4], stddev=0.01))
     #    Conv     -> (?, 1660, 300, 4)
     #    Pool     -> (?, 830, 150, 4)
     L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     '''
 
     # L2 ImgIn shape=(?, 830, 150, 4)
-    W2 = tf.Variable(tf.random_normal([5, 5, 4, 8], stddev=0.01))
+    W2 = tf.Variable(tf.random_normal([3, 3, 4, 8], stddev=0.01))
     #    Conv      ->(?, 830, 150, 8)
     #    Pool      ->(?, 415, 75, 8)
     L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
@@ -137,7 +137,6 @@ if __name__ == '__main__':
     # Test model
     test_x, test_file = load_test_data()
     print(test_x.shape)
-    print(test_file.shape)
 
     num_of_test = np.size(test_x, 0)
     for i in range(num_of_test):
