@@ -71,7 +71,7 @@ if __name__ == '__main__':
     nb_classes = np.size(train_y, 1)
 
     # hyper parameters
-    learning_rate = 0.001
+    learning_rate = 0.0001
     training_epochs = 15
 
     # input place holders
@@ -80,36 +80,35 @@ if __name__ == '__main__':
     Y = tf.placeholder(tf.float32, [None, nb_classes])
 
     # L1 ImgIn shape=(?, 1660, 300, 1)
-    W1 = tf.Variable(tf.random_normal([3, 3, 1, 8], stddev=0.01))
-    #    Conv     -> (?, 1660, 300, 8)
-    #    Pool     -> (?, 830, 150, 8)
+    W1 = tf.Variable(tf.random_normal([5, 5, 1, 4], stddev=0.01))
+    #    Conv     -> (?, 1660, 300, 4)
+    #    Pool     -> (?, 830, 150, 4)
     L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
     L1 = tf.nn.relu(L1)
     L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
     '''
-    Tensor("Conv2D:0", shape=(?, 1660, 300, 8), dtype=float32)
-    Tensor("Relu:0", shape=(?, 1660, 300, 8), dtype=float32)
-    Tensor("MaxPool:0", shape=(?, 830, 150, 8), dtype=float32)
+    Tensor("Conv2D:0", shape=(?, 1660, 300, 4), dtype=float32)
+    Tensor("Relu:0", shape=(?, 1660, 300, 4), dtype=float32)
+    Tensor("MaxPool:0", shape=(?, 830, 150, 4), dtype=float32)
     '''
 
-    # L2 ImgIn shape=(?, 830, 150, 8)
-    W2 = tf.Variable(tf.random_normal([3, 3, 8, 16], stddev=0.01))
-    #    Conv      ->(?, 830, 150, 16)
-    #    Pool      ->(?, 415, 75, 16)
+    # L2 ImgIn shape=(?, 830, 150, 4)
+    W2 = tf.Variable(tf.random_normal([5, 5, 4, 8], stddev=0.01))
+    #    Conv      ->(?, 830, 150, 8)
+    #    Pool      ->(?, 415, 75, 8)
     L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
     L2 = tf.nn.relu(L2)
-    L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-    L2_flat = tf.reshape(L2, [-1, 415 * 75 * 16])
+    L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    L2_flat = tf.reshape(L2, [-1, 415 * 75 * 8])
     '''
-    Tensor("Conv2D_1:0", shape=(?, 830, 150, 16), dtype=float32)
-    Tensor("Relu_1:0", shape=(?, 830, 150, 16), dtype=float32)
-    Tensor("MaxPool_1:0", shape=(?, 415, 75, 16), dtype=float32)
+    Tensor("Conv2D_1:0", shape=(?, 830, 150, 8), dtype=float32)
+    Tensor("Relu_1:0", shape=(?, 830, 150, 8), dtype=float32)
+    Tensor("MaxPool_1:0", shape=(?, 415, 75, 8), dtype=float32)
     Tensor("Reshape_1:0", shape=(?, 3136), dtype=float32)
     '''
 
-    # Final FC 415x75x16 inputs -> nb_classes outputs
-    W3 = tf.get_variable("W3", shape=[415 * 75 * 16, nb_classes],
+    # Final FC 415x75x8 inputs -> nb_classes outputs
+    W3 = tf.get_variable("W3", shape=[415 * 75 * 8, nb_classes],
                          initializer=tf.contrib.layers.xavier_initializer())
     b = tf.Variable(tf.random_normal([nb_classes]))
     logits = tf.matmul(L2_flat, W3) + b
@@ -143,47 +142,47 @@ if __name__ == '__main__':
     num_of_test = np.size(test_x, 0)
     for i in range(num_of_test):
         prediction = sess.run(tf.argmax(logits, 1), feed_dict={X: test_x[i:i+1]})
-        print("{0} \t{1}".format(test_file[i], "normal" if prediction == 1 else "defect"))
+        print("{0} \t{1}".format(test_file[i], "normal" if prediction == 0 else "defect"))
 
 '''
 (153, 498000)
 (153, 2)
 Learning started. It takes sometime.
-Epoch: 0001 cost = 0.004662924
-Epoch: 0002 cost = 0.188419205
-Epoch: 0003 cost = 0.039247033
-Epoch: 0004 cost = 0.040618155
-Epoch: 0005 cost = 0.036190968
-Epoch: 0006 cost = 0.011308689
-Epoch: 0007 cost = 0.014273564
-Epoch: 0008 cost = 0.013656499
-Epoch: 0009 cost = 0.005985412
-Epoch: 0010 cost = 0.013861140
-Epoch: 0011 cost = 0.007126274
-Epoch: 0012 cost = 0.004299227
-Epoch: 0013 cost = 0.003828601
-Epoch: 0014 cost = 0.004313457
-Epoch: 0015 cost = 0.003879488
+Epoch: 0001 cost = 0.006118566
+Epoch: 0002 cost = 0.027454155
+Epoch: 0003 cost = 0.018384832
+Epoch: 0004 cost = 0.004931309
+Epoch: 0005 cost = 0.011574129
+Epoch: 0006 cost = 0.013246659
+Epoch: 0007 cost = 0.008231123
+Epoch: 0008 cost = 0.003350557
+Epoch: 0009 cost = 0.004181052
+Epoch: 0010 cost = 0.005242712
+Epoch: 0011 cost = 0.004973323
+Epoch: 0012 cost = 0.004143124
+Epoch: 0013 cost = 0.003403048
+Epoch: 0014 cost = 0.002981643
+Epoch: 0015 cost = 0.002812635
 Learning Finished!
 (19, 498000)
 (19,)
-skive/test/0.png 	defect [0]
-skive/test/1.png 	defect [0]
-skive/test/10.png 	normal [1]
-skive/test/11.png 	normal [1]
-skive/test/12.png 	normal [1]
-skive/test/13.png 	normal [1]
-skive/test/14.png 	normal [1]
-skive/test/15.png 	normal [1]
-skive/test/16.png 	defect [0]
-skive/test/17.png 	defect [0]
-skive/test/18.png 	defect [0]
-skive/test/2.png 	defect [0]
-skive/test/3.png 	defect [0]
-skive/test/4.png 	defect [0]
-skive/test/5.png 	defect [0]
-skive/test/6.png 	defect [0]
-skive/test/7.png 	defect [0]
-skive/test/8.png 	defect [0]
-skive/test/9.png 	defect [0]
+skive/test/0.png 	normal
+skive/test/1.png 	normal
+skive/test/10.png 	defect
+skive/test/11.png 	defect
+skive/test/12.png 	defect
+skive/test/13.png 	defect
+skive/test/14.png 	defect
+skive/test/15.png 	defect
+skive/test/16.png 	defect
+skive/test/17.png 	defect
+skive/test/18.png 	defect
+skive/test/2.png 	normal
+skive/test/3.png 	normal
+skive/test/4.png 	normal
+skive/test/5.png 	normal
+skive/test/6.png 	normal
+skive/test/7.png 	normal
+skive/test/8.png 	normal
+skive/test/9.png 	normal
 '''
