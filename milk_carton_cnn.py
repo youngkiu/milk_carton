@@ -79,27 +79,27 @@ if __name__ == '__main__':
     X_img = tf.reshape(X, [-1, 1660, 300, 1])   # img 1660x300x1 (black/white)
     Y = tf.placeholder(tf.float32, [None, nb_classes])
 
-    # L1 ImgIn shape=(?, 1660, 300, 1)
+    # C1 ImgIn shape=(?, 1660, 300, 1)
     W1 = tf.Variable(tf.random_normal([5, 5, 1, 4], stddev=0.01))
     #    Conv     -> (?, 1660, 300, 4)
     #    Pool     -> (?, 830, 150, 4)
-    L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
-    L1 = tf.nn.relu(L1)
-    L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    C1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')
+    C1 = tf.nn.relu(C1)
+    S2 = tf.nn.max_pool(C1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
     '''
     Tensor("Conv2D:0", shape=(?, 1660, 300, 4), dtype=float32)
     Tensor("Relu:0", shape=(?, 1660, 300, 4), dtype=float32)
     Tensor("MaxPool:0", shape=(?, 830, 150, 4), dtype=float32)
     '''
 
-    # L2 ImgIn shape=(?, 830, 150, 4)
+    # C3 ImgIn shape=(?, 830, 150, 4)
     W2 = tf.Variable(tf.random_normal([5, 5, 4, 8], stddev=0.01))
     #    Conv      ->(?, 830, 150, 8)
     #    Pool      ->(?, 415, 75, 8)
-    L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
-    L2 = tf.nn.relu(L2)
-    L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-    L2_flat = tf.reshape(L2, [-1, 415 * 75 * 8])
+    C3 = tf.nn.conv2d(S2, W2, strides=[1, 1, 1, 1], padding='SAME')
+    C3 = tf.nn.relu(C3)
+    S4 = tf.nn.max_pool(C3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    F5 = tf.reshape(S4, [-1, 415 * 75 * 8])
     '''
     Tensor("Conv2D_1:0", shape=(?, 830, 150, 8), dtype=float32)
     Tensor("Relu_1:0", shape=(?, 830, 150, 8), dtype=float32)
@@ -111,11 +111,10 @@ if __name__ == '__main__':
     W3 = tf.get_variable("W3", shape=[415 * 75 * 8, nb_classes],
                          initializer=tf.contrib.layers.xavier_initializer())
     b = tf.Variable(tf.random_normal([nb_classes]))
-    logits = tf.matmul(L2_flat, W3) + b
+    logits = tf.matmul(F5, W3) + b
 
     # define cost/loss & optimizer
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-        logits=logits, labels=Y))
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=Y))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 
     # initialize
