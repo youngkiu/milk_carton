@@ -65,7 +65,7 @@ if __name__ == '__main__':
     train_x, train_y = load_train_data()
     print(train_x.shape)
     print(train_y.shape)
-
+    
     num_of_train = np.size(train_x, 0)
     image_size = np.size(train_x, 1)
     nb_classes = np.size(train_y, 1)
@@ -73,6 +73,7 @@ if __name__ == '__main__':
     # hyper parameters
     learning_rate = 0.0001
     training_epochs = 15
+    batch_size = 3
 
     # input place holders
     X = tf.placeholder(tf.float32, [None, image_size])
@@ -123,11 +124,15 @@ if __name__ == '__main__':
 
     # train my model
     print('Learning started. It takes sometime.')
+
+    total_batch = int(num_of_train / batch_size)
     for epoch in range(training_epochs):
         avg_cost = 0
-
-        c, _ = sess.run([cost, optimizer], feed_dict={X: train_x, Y: train_y})
-        avg_cost += c / num_of_train
+        for i in range(total_batch):
+            batch_x = train_x[i*batch_size:(i+1)*batch_size]
+            batch_y = train_y[i*batch_size:(i+1)*batch_size]
+            c, _ = sess.run([cost, optimizer], feed_dict={X: batch_x, Y: batch_y})
+            avg_cost += c / total_batch
 
         print('Epoch:', '%04d' % (epoch + 1), 'cost =', '{:.9f}'.format(avg_cost))
 
@@ -146,21 +151,21 @@ if __name__ == '__main__':
 (153, 498000)
 (153, 2)
 Learning started. It takes sometime.
-Epoch: 0001 cost = 0.006118566
-Epoch: 0002 cost = 0.027454155
-Epoch: 0003 cost = 0.018384832
-Epoch: 0004 cost = 0.004931309
-Epoch: 0005 cost = 0.011574129
-Epoch: 0006 cost = 0.013246659
-Epoch: 0007 cost = 0.008231123
-Epoch: 0008 cost = 0.003350557
-Epoch: 0009 cost = 0.004181052
-Epoch: 0010 cost = 0.005242712
-Epoch: 0011 cost = 0.004973323
-Epoch: 0012 cost = 0.004143124
-Epoch: 0013 cost = 0.003403048
-Epoch: 0014 cost = 0.002981643
-Epoch: 0015 cost = 0.002812635
+Epoch: 0001 cost = 3.529674595
+Epoch: 0002 cost = 1.198152409
+Epoch: 0003 cost = 0.746434966
+Epoch: 0004 cost = 0.918099420
+Epoch: 0005 cost = 0.348275243
+Epoch: 0006 cost = 0.175957333
+Epoch: 0007 cost = 0.250059961
+Epoch: 0008 cost = 0.256329637
+Epoch: 0009 cost = 0.159760816
+Epoch: 0010 cost = 0.085794412
+Epoch: 0011 cost = 0.077970891
+Epoch: 0012 cost = 0.068665664
+Epoch: 0013 cost = 0.061409960
+Epoch: 0014 cost = 0.053886106
+Epoch: 0015 cost = 0.056859106
 Learning Finished!
 (19, 498000)
 skive/test/0.png 	normal
